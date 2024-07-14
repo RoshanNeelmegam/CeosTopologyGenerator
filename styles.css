@@ -60,5 +60,9 @@ line {
     align-items: center;
     cursor: move;
     width: 100px;
-    height: 100px;
+    height: 50px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+    margin-left: 0px;
 }
