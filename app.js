@@ -218,7 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const nodes = document.getElementsByClassName('element-container');
         const links = document.getElementsByClassName('link-line');
         let ip = 10;
-        let yamlContent = "topology:\n";
+        let yamlContent = "name: Lab" + Math.round(Math.random()*1000) + "\n";
+        yamlContent += "topology:\n";
         yamlContent += "  kinds:\n";
         yamlContent += "    ceos:\n";
         yamlContent += "      image: ceosimage:4.27.3F\n";
@@ -234,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
             yamlContent += `    ${nodeId}:\n`;
             yamlContent += `      kind: ${nodeType}\n`;
-            yamlContent += `      mgmt-ipv4: 172.100.100.${ip}\n`;
+            yamlContent += `      mgmt-ipv4: 172.200.10.${ip}\n`;
             ip += 1;
         });
 
@@ -250,9 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Append mgmt section to YAML content
         yamlContent += "\nmgmt:\n";
-        yamlContent += "  network: mplsevpnirb\n";
-        yamlContent += "  ipv4-subnet: 172.100.100.0/24\n";
-        yamlContent += "  ipv6-subnet: 2001:172:100:100::/80\n";
+        yamlContent += "  network: LabNet" + Math.round(Math.random()*1000) + "\n";
+        yamlContent += "  ipv4-subnet: 172.200.10.0/24\n";
 
         // Displaying YAML content in textarea
         yamlOutput.value = yamlContent;

@@ -1,8 +1,20 @@
 body {
-    background-color: #FFFDD5; /* Cream background color */
+    background-color: #dbdbdb; /* Cream background color */
     font-family: Arial, sans-serif;
 }
 
+div#heading{
+    background-color: lightblue;
+    width: fit-content;
+    padding: 0 10 0 10;
+}
+
+h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: bold;
+    font-size: 2vw; /* Adjust this value to increase size */
+  }
+  
 .button-container {
     margin-top: 20px;
 }
