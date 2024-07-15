@@ -59,6 +59,8 @@ line {
     flex-direction: column;
     align-items: center;
     cursor: move;
-    width: 100px;
-    height: 100px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
