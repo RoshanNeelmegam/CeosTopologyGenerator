@@ -1,11 +1,31 @@
 body {
-    background-color: #FFFDD5; /* Cream background color */
+    background-color: #dbdbdb; /* Cream background color */
     font-family: Arial, sans-serif;
 }
 
-.button-container {
-    margin-top: 20px;
+div#heading{
+    background-color: lightblue;
+    width: fit-content;
+    padding: 0 10 0 10;
 }
+
+h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: bold;
+    font-size: 2vw; /* Adjust this value to increase size */
+  }
+  
+/* .button-container {
+    margin-top: 20px;
+} */
+
+.button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Add some space between items */
+    margin-bottom: 20px;
+}
+
 
 button:hover {
     background-color: #45a049; /* Darker green on hover */
@@ -23,6 +43,16 @@ button {
     /*cursor: pointer;  Pointer cursor on hover */
     border: none; /* No border */
     border-radius: 4px; /* Rounded corners */
+}
+
+#nodeOSForm{
+    width: fit-content;
+    margin: 0;
+}
+
+#hostOSForm{
+    width: fit-content;
+    margin: 0;
 }
 
 .topology-area {

@@ -1,20 +1,18 @@
-let connHolder = {};
-let connections = [];
+// Declaring data structures that hold the state
+let connHolder = {}; // holds the state in the following format. { 'node1': [ 1, 2, 3], 'host1': [1, 2, 3] }
+let connections = []; // holds the connection in the following format. [ ["leaf1:eth1","leaf2:eth1"], ["leaf1:eth3","leaf2:eth1"] ]
 
 document.addEventListener('DOMContentLoaded', () => {
     const addNodesButton = document.getElementById('addNodesButton');
     const addHostsButton = document.getElementById('addHostsButton');
     const topologyArea = document.getElementById('topologyArea');
     const linkModeButton = document.getElementById('linkModeButton');
-        const submitButton = document.getElementById('submitTopologyButton');
     const nodeImageSrc = 'node.jpg'; // Replace with the path to your node image
     const hostImageSrc = 'host.jpg'; // Replace with the path to your host image
-
     // Declaring a few global trackers
     let isLinkMode = false;
     let selectedElement = null;
     let currentLine = null;
- // To store the connections
 
     addNodesButton.addEventListener('click', () => {
         const numberOfNodes = prompt('How many nodes do you want to add?');
@@ -27,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     linkModeButton.addEventListener('click', () => {
-        isLinkMode = !isLinkMode;
+        isLinkMode = !isLinkMode; // this state is now passed to toggleLinkMode function that acts according to the state
         toggleLinkMode(isLinkMode);
     });
 
@@ -88,32 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     function toggleLinkMode(enable) {
-        const elements = document.getElementsByClassName('node');
-        const hostElements = document.getElementsByClassName('host');
-        for (let element of elements) {
-            element.draggable = !enable;
-        }
-        for (let element of hostElements) {
+        const elements = document.getElementsByClassName('element-container'); // returns an array of node/hosts
+        for (let element of elements) { // using for/of to iterate through each element in the list. for/in will just interate through the list index
             element.draggable = !enable;
         }
         if (enable) {
+            linkModeButton.style.backgroundColor = 'hotpink';
+            // Using Array.from() to create a copy of elements array and run a function on each element of the array
             Array.from(elements).forEach(element => {
-                element.removeEventListener('dragstart', dragStart);
-                element.removeEventListener('dragend', dragEnd);
-                element.addEventListener('click', startLinking);
-            });
-            Array.from(hostElements).forEach(element => {
                 element.removeEventListener('dragstart', dragStart);
                 element.removeEventListener('dragend', dragEnd);
                 element.addEventListener('click', startLinking);
             });
         } else {
+            linkModeButton.style.backgroundColor = "#4CAF50";
             Array.from(elements).forEach(element => {
-                element.addEventListener('dragstart', dragStart);
-                element.addEventListener('dragend', dragEnd);
-                element.removeEventListener('click', startLinking);
-            });
-            Array.from(hostElements).forEach(element => {
                 element.addEventListener('dragstart', dragStart);
                 element.addEventListener('dragend', dragEnd);
                 element.removeEventListener('click', startLinking);
@@ -124,45 +111,56 @@ document.addEventListener('DOMContentLoaded', () => {
     function startLinking(event) {
         if (isLinkMode && !currentLine) {
             const rect = topologyArea.getBoundingClientRect();
-            const x1 = event.clientX - rect.left;
+            // getting the x, y value of the mouse pointer 
+            const x1 = event.clientX - rect.left; 
             const y1 = event.clientY - rect.top;
     
-            currentLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            currentLine.setAttribute('x1', x1);
-            currentLine.setAttribute('y1', y1);
-            currentLine.setAttribute('x2', x1);
+            currentLine = document.createElementNS('http://www.w3.org/2000/svg', 'line'); // creates an SVG element line
+            currentLine.setAttribute('x1', x1); // setting the x1 value 
+            currentLine.setAttribute('y1', y1); // setting the y1 value
+
+            // hardcoding x2, y2 values to prevent abnormal behaviour
+            currentLine.setAttribute('x2', x1); 
             currentLine.setAttribute('y2', y1);
-            svgArea.appendChild(currentLine);
-    
+            svgArea.appendChild(currentLine); // adding the element to the svg area
+
             document.addEventListener('mousemove', drawLine);
             document.addEventListener('mouseup', endLinking);
-            selectedElement = event.target;
+            selectedElement = event.target; // initial element
+            const elements = document.getElementsByClassName('element-container');
+            Array.from(elements).forEach(element => {
+                element.removeEventListener('click', startLinking);
+            });
         }
     }
     
     function drawLine(event) {
+        // tracking the mouse event to drag the line as per the mouse pointer 
         if (!currentLine) return;
-    
-        const rect = topologyArea.getBoundingClientRect();
-        const x2 = event.clientX - rect.left;
-        const y2 = event.clientY - rect.top;
-    
-        currentLine.setAttribute('x2', x2);
-        currentLine.setAttribute('y2', y2);
+
+        const rect = topologyArea.getBoundingClientRect();    
+        currentLine.setAttribute('x2', event.clientX - rect.left);
+        currentLine.setAttribute('y2', event.clientY - rect.top);
     }
     
     function endLinking(event) {
+        // removing the event listeners 
         document.removeEventListener('mousemove', drawLine);
         document.removeEventListener('mouseup', endLinking);
+        
+    
+        // if the line is not on the initial element and if it's on another node or host and given that it's not on any other element
         if (event.target !== selectedElement && (event.target.classList.contains('node') || event.target.classList.contains('host'))) {
-            const from = selectedElement;
-            const to = event.target;
+            const from = selectedElement; // initial element
+            const to = event.target; // final element 
             // checks if node is in dictionary or not and accordingly records the state
-            if (!(from.id in connHolder)){
+            if (!(from.id in connHolder)){ 
+                // if the node is not in the connHolder dictionary
                 connHolder[from.id] = [1];
-                fromPort = connHolder[from.id].slice(-1)[0];
+                fromPort = 1; 
             }
             else{
+                // if the node is alredy there in the connHolder dictionary then just add the port to the list of ports of the node
                 fromPort = connHolder[from.id].slice(-1)[0] + 1 ;
                 connHolder[from.id].push(fromPort);
             }
@@ -193,42 +191,65 @@ document.addEventListener('DOMContentLoaded', () => {
             svgArea.removeChild(currentLine);
             selectedElement = null;
         }
-    
         currentLine = null;
+        setTimeout(() => {
+            const elements = document.getElementsByClassName('element-container');
+            Array.from(elements).forEach(element => {
+                element.addEventListener('click', startLinking);
+            });
+        }, 100); // Adjust the delay as needed
     }
-
+  
     topologyArea.addEventListener('dragover', (event) => {
         event.preventDefault();
     });
-
-
-    
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submitTopologyButton');
     const yamlOutput = document.getElementById('yamlOutput');
 
+    // Declaring the nodeOS form
+    const nodeOSSelect = document.getElementById('nodeOS');
+
+    // Function to get the selected value when needed
+    function getSelectedNodeOS() {
+        const selectedValue = nodeOSSelect.value;
+        return selectedValue;
+    }
+
+    // Declaring the hostOS form
+    const hostOSSelect = document.getElementById('hostOS');
+
+    // Function to get the selected value when needed
+    function getSelectedHostOS() {
+        const selectedValue = hostOSSelect.value;
+        return selectedValue;
+
+    }
+    
+
     submitButton.addEventListener('click', () => {
         const nodes = document.getElementsByClassName('element-container');
         const links = document.getElementsByClassName('link-line');
-        let ip = 10;
+        const selectedNodeOS = getSelectedNodeOS();
+        const selectedHostOS = getSelectedHostOS();
+        let ip = 10; // starting host ip address
         let yamlContent = "name: Lab" + Math.round(Math.random()*1000) + "\n";
         yamlContent += "topology:\n";
         yamlContent += "  kinds:\n";
         yamlContent += "    ceos:\n";
-        yamlContent += "      image: ceosimage:4.30.2F\n";
-        yamlContent += "    linux:\n";
-        yamlContent += "      image: alpine-host\n";
+        yamlContent += "      image: " + selectedNodeOS + "\n";
+        yamlContent += "    host:\n";
+        yamlContent += "      image: " + selectedHostOS + "\n";
         yamlContent += "  nodes:\n";
 
         // Collecting nodes information
         Object.entries(connHolder).forEach(([key, value]) => {
             const nodeId = key;
             const element = document.getElementById(nodeId); // Fetch the DOM element by its ID
-            const nodeType = element.classList.contains('node') ? 'ceos' : 'linux';
+            const nodeType = element.classList.contains('node') ? 'ceos' : 'host';
         
-
             yamlContent += `    ${nodeId}:\n`;
             yamlContent += `      kind: ${nodeType}\n`;
             yamlContent += `      mgmt-ipv4: 172.200.10.${ip}\n`;
