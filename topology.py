@@ -23,20 +23,45 @@ in_process = False
 first_node = ''
 second_node = ''
 
+
+class Node(turtle.Turtle):
+    def __init(self):
+        super.__init__()
+
+    def update_caption_pos(self, x, y):
+        if link_mode_var is False:
+            try:
+                caption_obj = nodes_dict[self]['caption']
+            except Exception as e:
+                caption_obj = hosts_dict[self]['caption']        
+            caption_obj.clear()
+            caption_obj.penup()
+            try:
+                nodes_dict[self]['identity']
+                caption_obj.goto(x-11, y-40)
+            except Exception as e:
+                caption_obj.goto(x-15, y-60)
+            caption_obj.pendown()
+            try:
+                name = nodes_dict[self]['name']
+            except Exception as e:
+                name = hosts_dict[self]['name']
+            caption_obj.write(name)
+
 def create_nodes(number_of_nodes):
     global global_node_count
     for i in range(global_node_count, global_node_count+number_of_nodes):
-        node_turtle = turtle.Turtle()
+        node_turtle = Node()
+        print(node_turtle)
         node_turtle.speed(0)
         node_turtle.shape('test.gif')
         node_turtle.penup()
         position = (10+random.randint(0, 100),20+random.randint(0, 200))
         node_turtle.setposition(position)
+        node_turtle_caption = create_button_or_caption_name(position[0]-11, position[1]-40, f'Node{i}')
         node_turtle.ondrag(node_turtle.goto)
-        # node_turtle_caption = create_button_or_caption_name(position[0]-11, position[1]-40, f'Node{i}')
-        # nodes_dict[f'Node{i}'] = {'object': node_turtle, 'object_caption':node_turtle_caption, 'number_of_interfaces': 1}
-        # node_turtle.write(f'node{i}')
-        nodes_dict[f'Node{i}'] = {'object': node_turtle, 'number_of_interfaces': 1}
+        node_turtle.onrelease(node_turtle.update_caption_pos)
+        nodes_dict[node_turtle] = {'name': f'Node{i}', 'caption': node_turtle_caption, 'number_of_interfaces': 1, 'identity': 'node'}
     global_node_count += number_of_nodes
 
 def add_nodes(*args, **kwargs):
@@ -46,17 +71,17 @@ def add_nodes(*args, **kwargs):
 def create_hosts(number_of_hosts):
     global global_host_count
     for i in range(global_host_count, global_host_count+number_of_hosts):
-        host_turtle = turtle.Turtle()
+        host_turtle = Node()
         host_turtle.speed(0)
         host_turtle.fillcolor('yellow')
         host_turtle.shape('host.gif')
         host_turtle.penup()
         position = (10+random.randint(0, 100),20+random.randint(0, 200))
         host_turtle.setposition(position)
+        host_turtle_caption = create_button_or_caption_name(position[0]-15, position[1]-60, f'Host{i}')
         host_turtle.ondrag(host_turtle.goto)
-        # host_turtle_caption = create_button_or_caption_name(position[0]-15, position[1]-60, f'Host{i}')
-        # hosts_dict[f'Host{i}'] = {'object': host_turtle, 'object_caption':host_turtle_caption, 'number_of_interfaces': 1}
-        hosts_dict[f'Host{i}'] = {'object': host_turtle, 'number_of_interfaces': 1}
+        host_turtle.onrelease(host_turtle.update_caption_pos)
+        hosts_dict[host_turtle] = {'name': f'Host{i}', 'caption': host_turtle_caption, 'number_of_interfaces': 1, 'identity': 'host'}
     global_host_count += number_of_hosts
         
 def add_hosts(*args, **kwargs):
@@ -82,63 +107,48 @@ def on_node_click_for_link_mode(x, y):
 
         # Find the start node
         for node_key in nodes_dict:           
-            if nodes_dict[node_key]['object'].distance(start_node) < 45:
-                first_node = node_key
+            if node_key.distance(start_node) < 45:
+                first_node = nodes_dict[node_key]['name']
                 print(f'first node is {first_node}')
                 start_eth = nodes_dict[node_key]['number_of_interfaces']
                 # nodes_dict[node_key]['number_of_interfaces'] += 1
                 break
         for host_key in hosts_dict:
-            if hosts_dict[host_key]['object'].distance(start_node) < 45:
-                first_node = host_key
+            if host_key.distance(start_node) < 45:
+                first_node = hosts_dict[host_key]['name']
                 print(f'first node is {first_node}')
                 start_eth = hosts_dict[host_key]['number_of_interfaces']
                 # hosts_dict[host_key]['number_of_interfaces'] += 1
                 break
         # Find the end node
         for node_key in nodes_dict:
-            if nodes_dict[node_key]['object'].distance(end_node) < 45:
-                second_node = node_key
+            if node_key.distance(end_node) < 45:
+                second_node = nodes_dict[node_key]['name']
                 print(f'second node is {second_node}')
                 end_eth = nodes_dict[node_key]['number_of_interfaces']
                 # nodes_dict[node_key]['number_of_interfaces'] += 1    
                 break    
         for host_key in hosts_dict:
-            if hosts_dict[host_key]['object'].distance(end_node) < 45:
-                second_node = host_key
+            if host_key.distance(end_node) < 45:
+                second_node = hosts_dict[host_key]['name']
                 print(f'second node is {second_node}')
                 end_eth = hosts_dict[host_key]['number_of_interfaces']
                 # hosts_dict[host_key]['number_of_interfaces'] += 1    
                 break    
         if first_node != second_node and (first_node != '' and second_node != ''):        
             draw_line(start_node, end_node)
-            try: 
-                nodes_dict[first_node]['number_of_interfaces'] += 1
-            except Exception as e:
-                 pass
-            try:
-                hosts_dict[first_node]['number_of_interfaces'] += 1
-            except Exception as e:
-                pass
-            try: 
-                nodes_dict[second_node]['number_of_interfaces'] += 1
-            except Exception as e:
-                pass
-            try: 
-                hosts_dict[second_node]['number_of_interfaces'] += 1
-            except Exception as e:
-                pass
+            for nodes in nodes_dict:
+                if first_node == nodes_dict[nodes]['name']:
+                    nodes_dict[nodes]['number_of_interfaces'] += 1
+                elif second_node == nodes_dict[nodes]['name']:
+                    nodes_dict[nodes]['number_of_interfaces'] += 1
+            for hosts in hosts_dict:
+                if first_node == hosts_dict[hosts]['name']:
+                    hosts_dict[hosts]['number_of_interfaces'] += 1
+                elif second_node == hosts_dict[hosts]['name']:
+                    hosts_dict[hosts]['number_of_interfaces'] += 1
             state_list.append({first_node:f'eth{start_eth}', second_node:f'eth{end_eth}'})    
             print(state_list)
-        #     first_node = ''
-        #     second_node = '' 
-        #     start_node = None
-        #     in_process = False
-        # else:
-        #     start_node = None
-        #     in_process = False
-        #     first_node = ''
-        #     second_node = ''
         start_node = None
         in_process = False
         first_node = ''
@@ -147,12 +157,12 @@ def on_node_click_for_link_mode(x, y):
 def link_mode_nodes_hosts_behaviour(dictionary, link_mode, ondrag_method=disable_shit, onclick_method=on_node_click_for_link_mode):
     if link_mode:
         for device in dictionary:
-            dictionary[device]['object'].ondrag(ondrag_method)
-            dictionary[device]['object'].onclick(onclick_method)
+            device.ondrag(ondrag_method)
+            device.onclick(onclick_method)
     else:
          for device in dictionary:
-            dictionary[device]['object'].ondrag(dictionary[device]['object'].goto)
-            dictionary[device]['object'].onclick(disable_shit)       
+            device.ondrag(device.goto)
+            device.onclick(disable_shit)       
 
 # link mode disables dragging and enables link addition method
 def link_mode(*args, **kwargs):
