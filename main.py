@@ -3,6 +3,7 @@ from button import Button
 from device import Device
 from connection import Connection
 from topology_yaml import Topology_yaml
+from device_board import DeviceBoard
 
 # global variables
 switch_count = 1
@@ -20,8 +21,10 @@ host_image = ''
 
 topo_screen = turtle.Screen()
 topo_screen.setup(1500, 900)
+topo_screen.bgcolor("ghost white")
 topo_screen.register_shape('router.gif')
 topo_screen.register_shape('host.gif')
+board = DeviceBoard()
 
 def add_nodes_func(*args, **kwargs):
     global switch_count
@@ -47,6 +50,7 @@ def create_connections(x, y):
     global devices_dict
     global starting_points
     global starting_device
+    global board
     if not is_connection_in_progress:
         starting_points = (x, y)
         starting_device = None
@@ -58,6 +62,7 @@ def create_connections(x, y):
             # print('yes new instance of link mode')
             return
         is_connection_in_progress = True
+        board.display(starting_device=starting_device.caption)
     else:   
         ending_points = (x, y)
         ending_device = None
@@ -65,14 +70,20 @@ def create_connections(x, y):
             for device in devices_dict[top_device]:
                 if device.obj_instance.distance(ending_points) < 40:
                     ending_device = device
-        if ending_device is None:
+        if starting_device == ending_device:
+            board.display()
+            is_connection_in_progress = False
+            return
+        elif ending_device is None:
             # print('no proper end so continuing instance from next')
+            board.display(starting_device=starting_device.caption)
             return
         else:
             # print('new or old instance for ending')
+            board.display(starting_device=starting_device.caption, ending_device=ending_device.caption)
             connection = Connection(starting_points, ending_points)
             connection.create()
-            connections_list.append(f'"{starting_device.caption}:eth{starting_device.no_of_interfaces}","{ending_device.caption}:eth{ending_device.no_of_interfaces}"')
+            connections_list.append(f'"{starting_device.caption}:eth{starting_device.no_of_interfaces}", "{ending_device.caption}:eth{ending_device.no_of_interfaces}"')
             starting_device.no_of_interfaces += 1
             ending_device.no_of_interfaces += 1
             is_connection_in_progress = False

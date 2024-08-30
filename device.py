@@ -6,8 +6,8 @@ class Device():
         self.obj_instance = turtle.Turtle()
         self.type = type
         self.speed = 0
-        self.x_cor = random.randint(0, 100)
-        self.y_cor = random.randint(0, 100)
+        self.x_cor = random.randint(0, 400)
+        self.y_cor = random.randint(0, 250)
         self.caption = caption
         self.no_of_interfaces = 1
         self.set_properties_and_create()

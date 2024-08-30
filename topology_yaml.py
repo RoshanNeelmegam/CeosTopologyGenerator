@@ -23,7 +23,7 @@ class Topology_yaml():
             self.host_image = host_image
             self.mgmt_ip = mgmt_ip
             self.mgmt_subnet = re.findall(r'(\d+\.\d+\.\d+)\.\d+.+')[0]
-            self.ip = 1
+            self.ip = 10
             self.switch_kind = switch_kind
         self.devices_dict = device_dict
         self.connection_list = connections_list
@@ -59,7 +59,7 @@ topology:
     - endpoints: [{connections}]"""
         self.contents += f"""
 mgmt:
-  network: {self.lab_name}
+  network: lab_{self.lab_name}_network
   ipv4-subnet: {self.mgmt_ip}"""
         return(self.contents)
 

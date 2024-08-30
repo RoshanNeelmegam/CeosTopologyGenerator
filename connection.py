@@ -11,6 +11,7 @@ class Connection():
         line.hideturtle()
         line.penup()
         line.goto(self.starting_points)
+        line.width(2)
         line.pendown()
         line.goto(self.ending_points)
         line.penup()
