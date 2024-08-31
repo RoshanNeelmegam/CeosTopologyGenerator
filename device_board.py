@@ -15,3 +15,6 @@ class DeviceBoard():
         self.obj_instance.penup()
         self.obj_instance.goto(-30, 400)
         self.obj_instance.write(f'Starting Device: {self.starting_device}\nEnding Device: {self.ending_device}', font=("Arial", 8, 'normal', 'bold'))
+
+    def stop_displaying(self):
+        self.obj_instance.clear()
