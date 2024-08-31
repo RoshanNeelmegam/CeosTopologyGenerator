@@ -46,15 +46,15 @@ topology:
                 for switch in self.devices_dict[top_level_device]:
                     self.contents += f"""
     {switch.caption}:
-        kind: {self.switch_kind}
-        mgmt-ipv4: {self.mgmt_subnet}.{self.ip}"""
+      kind: {self.switch_kind}
+      mgmt-ipv4: {self.mgmt_subnet}.{self.ip}"""
                     self.ip += 1
             elif top_level_device == 'hosts':
                 for host in self.devices_dict[top_level_device]:
                     self.contents += f"""
     {host.caption}:
-        kind: {self.host_kind}
-        mgmt-ipv4: {self.mgmt_subnet}.{self.ip}"""
+      kind: {self.host_kind}
+      mgmt-ipv4: {self.mgmt_subnet}.{self.ip}"""
                     self.ip += 1
         self.contents += """  
   links:"""
